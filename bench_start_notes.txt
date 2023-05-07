@@ -1,0 +1,25 @@
+notes on running benchmarks.
+
+related files:
+ - bench_go_start.sql
+ - bench_go_run.sql   (many need editing to set timeout and/or sleep call)
+ - to.bat (timeout, the windows-7 equivalent of sleep.exe or sleep on unix)
+
+
+Here is the trick to start benchmarks either all-at-once or staggered.
+
+
+Set a starting point in controlling session:
+SQL> @bench_go_start.sql
+
+This will set an SQL-plus session to the point where you can hit "ENTER" to start...
+
+
+To set slaves:
+SQL> @bench_go_run.sql
+
+This will set slaves to wait for the "ENTER"  in the bench-go-start.
+Each of the slaves will either start (near)immediate, or they 
+will wait to start staggered by a nr of seconds (hardcoded in the bench-go-start)
+
+	

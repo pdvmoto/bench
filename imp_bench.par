@@ -1,0 +1,7 @@
+userid=scott/tiger@localhost:1521/orclpdb1
+file=bench.dmp
+fromuser=HR
+touser=scott
+grants=n
+ignore=y
+rows=y
