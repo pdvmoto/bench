@@ -1,0 +1,39 @@
+
+-- read this into sqldevloper
+
+select * from v$session 
+where username = 'SCOTT'; 
+
+select * from v$sqlarea 
+order by executions desc ; 
+
+-- session info
+select s.sid, s.username, s.module, s.sql_id, s.event, substr ( sa.sql_text, 1, 40)
+, s.machine, s.terminal, s.program 
+, s.* 
+from v$session  s
+, v$sqlarea sa
+where 1=1
+and sa.sql_id = s.sql_id 
+and s.schemaname <> 'SYS'; 
+
+-- gets / executes.. straight from V$SQLAREA
+select s.sql_id, round ( s.buffer_gets/s.executions, 2)  as get_p_x, 
+s.* from v$sqlarea  s
+where s.executions > 0 
+order by 2 desc 
+; 
+
+
+-- sql_plan..
+select * from v$sql_plan
+where object_name like 'EMP_NAME_IX'
+--or sql_id like '2jg70wg89118p'
+;
+
+-- bind variables caputured
+select * from v$sql_bind_capture ;
+
+select cpu_count_current, cpu_core_count_current, cpu_socket_count_current 
+from v$license ; 
+
