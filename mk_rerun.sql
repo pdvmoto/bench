@@ -82,10 +82,13 @@ prompt set timing on
 prompt set linesize 150 
 prompt set feedback on
 prompt 
-prompt "-- and 2nd run with autotrace on"
+prompt /* -- and 2nd run with autotrace on */
 
 prompt /
  
+prompt set autotrace off
+prompt set timing off
+
 prompt /* --                                                          */
 prompt /* -- use this file to edit and run stmnt with variables       */
 prompt /* -- SQL> ed rerun_&1..lst                                      */

@@ -1,4 +1,60 @@
 
+
+select * from v$session 
+where username = 'SCOTT'; 
+
+select * from v$sqlarea 
+order by executions desc ; 
+
+-- session info
+select s.sid, s.username, s.module, s.sql_id, s.event, substr ( sa.sql_text, 1, 40)
+, s.machine, s.terminal, s.program 
+, s.* 
+from v$session  s
+, v$sqlarea sa
+where 1=1
+and sa.sql_id = s.sql_id 
+and s.schemaname <> 'SYS'; 
+
+-- gets / executes.. straight from V$SQLAREA
+select s.sql_id, round ( s.buffer_gets/s.executions)  as get_p_x, 
+s.* from v$sqlarea  s
+where s.executions > 0 
+order by 2 desc 
+; 
+
+-- plan..
+select sqp.operation, sqp.options, sqp.object_owner, sqp.object_name
+, sqp.* from v$sql_plan sqp
+where 1=1
+-- and object_name like 'EMP_NAME_IX'
+and sql_id like '1tgvdmqm84702'
+order by id
+;
+
+-- bind variables caputured
+select bvc.sql_id, bvc.name, bvc.value_string, bvc.* 
+from v$sql_bind_capture bvc 
+where sql_id = '1tgvdmqm84702'
+order by bvc.sql_id;
+
+select cpu_count_current, cpu_core_count_current, cpu_socket_count_current 
+from v$license ; 
+
+
+select sqa.sql_id, sqa.plan_hash_value, sqa.executions
+--, sqp.* 
+from 
+v$sql_plan sqp
+, v$sqlarea sqa 
+where sqp.sql_id = sqa.sql_id
+and object_name = upper ( '&1' )
+order by sqa.executions desc ;
+
+
+
+-- old one below -- 
+
 -- read this into sqldevloper
 
 select * from v$session 
@@ -36,4 +92,12 @@ select * from v$sql_bind_capture ;
 
 select cpu_count_current, cpu_core_count_current, cpu_socket_count_current 
 from v$license ; 
+
+
+to import, imp has to run from the container (imp-version  = db-version)
+hence you need to copy the dmpfile, and edit a parfile
+docker cp ./imp_bench2.par 7380dd4004b4:/tmp
+
+filling of the demo can be done via bench_fill.dmp
+
 
