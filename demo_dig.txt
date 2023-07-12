@@ -100,4 +100,6 @@ docker cp ./imp_bench2.par 7380dd4004b4:/tmp
 
 filling of the demo can be done via bench_fill.dmp
 
+activate awr:
+alter system set control_management_pack_access='diagnostic+tuning' SCOPE=BOTH ;  
 
