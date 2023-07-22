@@ -34,8 +34,9 @@ column cost        format 9999999
 column acc_pred     format A30 
 column fltr_pred    format A30 
 
-
 column explout format A60 newline
+
+spool sql_&1..lst
 
 prompt
 prompt
@@ -304,7 +305,7 @@ prompt '--------- plans from memory -- '
 
 -- explain from memory if available
 
-SELECT plan_table_output FROM table(DBMS_XPLAN.DISPLAY_CURSOR('&1'));
+SELECT plan_table_output FROM table(DBMS_XPLAN.DISPLAY_CURSOR('&1', 0, 'ADVANCED'));
 
 -- explained from AWR, whatever is available
 
@@ -312,6 +313,52 @@ prompt '--------- plans from awr -- '
 
 select plan_table_output from table (dbms_xplan.display_awr('&1'));
 
+prompt ' . ' 
+prompt ' -------- objects from v$sql_plan: estiated rows, count-queries --- '
+prompt ' . ' 
+
+column obj_own_name     format A30
+column last_analyzed    format A20
+column est_rows         format 999,999
+column est_keys         format 999,999
+
+
+select p.object_owner || '.' || p.object_name || ' (T)' as obj_own_name
+, to_char ( t.last_analyzed, 'YYYY-MON-DD HH24:MI:SS' ) as last_analyzed
+, t.num_rows est_rows
+--, p.object_type, p.object_owner, p.object_name  
+--, p.* 
+from v$sql_plan p 
+   , dba_tables t
+where 1=1
+and p.object_owner = t.owner
+and p.object_name = t.table_name
+and sql_id = '&1'
+and p.object_type like 'TAB%'
+order by p.position ; 
+
+
+select p.object_owner || '.' || p.object_name 
+|| case i.uniqueness 
+   when 'UNIQUE' then 
+        ' (UNQ)'
+   else ' (IDX)'
+end  as obj_own_name
+, to_char ( i.last_analyzed, 'YYYY-MON-DD HH24:MI:SS' ) as last_analyzed
+, i.distinct_keys est_keys
+--, p.object_type, p.object_owner, p.object_name  
+--, p.* 
+from v$sql_plan p 
+   , dba_indexes i
+where 1=1
+and p.object_owner = i.owner
+and p.object_name = i.index_name
+and sql_id = '&1'
+and p.object_type like 'IND%'
+order by p.position ; 
+
+
+prompt . 
 prompt . 
 prompt . output in :
 prompt ed sql_&1..lst

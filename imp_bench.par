@@ -1,4 +1,4 @@
-userid=scott/tiger@localhost:1521/orclpdb1
+userid=scott/tiger@localhost:1527/mypdb
 file=bench.dmp
 fromuser=HR
 touser=scott
